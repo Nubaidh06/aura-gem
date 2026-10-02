@@ -55,3 +55,8 @@ A modern e-commerce web application built for fine jewelry retail, powered by No
 
 6. **Open in Browser:**
    Visit `http://localhost:3000`
+
+### Default Test Accounts
+- **Store Administrator:** `admin@auragem.com` (Password: `admin123`)
+- **Customer Account:** `sarah.j@example.com` (Password: `password123`)
+- **Alternative Customer:** `m.chen@example.com` (Password: `password123`)
