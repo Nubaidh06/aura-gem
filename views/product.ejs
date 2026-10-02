@@ -1,0 +1,215 @@
+<%- include('partials/header') %>
+
+<div class="breadcrumb-bar">
+  <a href="/catalog" class="back-link">&larr; Back to Catalog</a>
+  <span class="breadcrumb-separator">/</span>
+  <span class="breadcrumb-current"><%= product.name %></span>
+</div>
+
+<div class="product-detail-layout">
+  <!-- Left Column: High-Definition Product Showcase -->
+  <div class="product-media-column">
+    <div class="product-detail-image-card">
+      <% if (product.image_url) { %>
+        <img src="<%= product.image_url %>" alt="<%= product.name %>" class="product-detail-img">
+      <% } else { %>
+        <div class="product-placeholder-box">Fine Jewelry Piece</div>
+      <% } %>
+    </div>
+  </div>
+
+  <!-- Right Column: Product Information & Purchase -->
+  <div class="product-info-column">
+    <div class="product-badge-row">
+      <span class="product-badge"><%= category ? category.name : 'Fine Jewelry' %> &bull; <%= product.gemstone %></span>
+      <span class="stock-pill"><%= product.stock_quantity %> units available</span>
+    </div>
+
+    <h1 class="product-detail-title"><%= product.name %></h1>
+
+    <!-- Rating Display -->
+    <div class="product-rating-row">
+      <span class="star-rating-score">Rating: <%= ratingStats.avgRating > 0 ? ratingStats.avgRating : 'New' %> / 5</span>
+      <span class="review-count-badge">
+        (<%= ratingStats.totalReviews %> <%= ratingStats.totalReviews === 1 ? 'review' : 'reviews' %>)
+      </span>
+    </div>
+
+    <div class="product-price-display">
+      $<%= product.price.toLocaleString() %>
+      <span class="price-tax-note">Includes insured certificate</span>
+    </div>
+
+    <p class="product-detail-description">
+      <%= product.description %>
+    </p>
+
+    <!-- Actions -->
+    <div class="purchase-box">
+      <form action="/cart/add" method="POST" class="add-to-cart-form">
+        <input type="hidden" name="productId" value="<%= product._id %>">
+        <div class="quantity-input-wrapper">
+          <label for="quantityInput" class="quantity-label">Qty</label>
+          <input 
+            type="number" 
+            id="quantityInput"
+            name="quantity" 
+            value="1" 
+            min="1" 
+            max="<%= product.stock_quantity %>"
+            class="quantity-field"
+          >
+        </div>
+        <button 
+          type="submit" 
+          class="btn btn-primary btn-add-bag" 
+          <%= product.stock_quantity <= 0 ? 'disabled' : '' %>
+        >
+          <%= product.stock_quantity > 0 ? 'Add to Bag' : 'Out of Stock' %>
+        </button>
+      </form>
+
+      <% if (currentCustomer) { %>
+        <form action="/customer/<%= currentCustomer._id %>/wishlist/add" method="POST" style="margin-top: 0.75rem;">
+          <input type="hidden" name="productId" value="<%= product._id %>">
+          <button type="submit" class="btn btn-wishlist-wide">
+            Save to Wishlist (<%= currentCustomer.name %>)
+          </button>
+        </form>
+      <% } else { %>
+        <div style="margin-top: 0.75rem;">
+          <a href="/login" class="btn btn-wishlist-wide" style="display: block; text-align: center; text-decoration: none;">
+            Sign In to Save to Wishlist
+          </a>
+        </div>
+      <% } %>
+      <% if (currentCustomer && currentCustomer.role === 'admin') { %>
+        <div style="margin-top: 1.5rem; padding: 1.25rem; border: 1px dashed var(--gold); border-radius: var(--radius-sm); background: var(--bg-surface);">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
+            <div>
+              <strong style="font-size: 0.82rem; text-transform: uppercase; letter-spacing: 1px; color: var(--gold-dark); display: block;">
+                Administrator Action
+              </strong>
+              <span style="font-size: 0.78rem; color: var(--text-muted);">
+                Permanently delist this piece from MongoDB catalog
+              </span>
+            </div>
+            <form action="/admin/products/delete/<%= product._id %>" method="POST" style="margin: 0;">
+              <button 
+                type="submit" 
+                class="btn btn-danger btn-sm" 
+                onclick="return confirm('Permanently remove &quot;<%= product.name %>&quot; from catalog?')"
+              >
+                Delete Listing
+              </button>
+            </form>
+          </div>
+        </div>
+      <% } %>
+    </div>
+
+    <!-- Product Attributes Specifications -->
+    <div class="specifications-box">
+      <h3 class="spec-title">Artisan Specifications</h3>
+      <div class="attributes-list">
+        <div class="attribute-item">
+          <strong>Precious Metal</strong> 
+          <span><%= product.metal_type %></span>
+        </div>
+        <div class="attribute-item">
+          <strong>Primary Gemstone</strong> 
+          <span><%= product.gemstone %></span>
+        </div>
+        <div class="attribute-item">
+          <strong>Inventory Available</strong> 
+          <span><%= product.stock_quantity %> units</span>
+        </div>
+        <% if (product.attributes) { %>
+          <% for (const [key, value] of Object.entries(product.attributes)) { %>
+            <div class="attribute-item">
+              <strong><%= key.replace(/_/g, ' ').toUpperCase() %></strong> 
+              <span><%= Array.isArray(value) ? value.join(', ') : value %></span>
+            </div>
+          <% } %>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Reviews Section -->
+<div class="reviews-section">
+  <div class="page-header" style="display: flex; justify-content: space-between; align-items: baseline; text-align: left; margin-bottom: 0;">
+    <h2 style="font-family: var(--font-heading); font-weight: normal; font-size: 2rem;">Customer Reviews</h2>
+    <span style="color: var(--text-muted); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;">
+      Average: <%= ratingStats.avgRating %>/5 (<%= ratingStats.totalReviews %> total)
+    </span>
+  </div>
+
+  <div class="reviews-grid">
+    <!-- Submit Review Form -->
+    <div class="review-card" style="border: none;">
+      <h3 style="margin-bottom: 1.5rem; font-family: var(--font-heading); font-weight: normal;">Write a Review</h3>
+      <% if (currentCustomer) { %>
+        <form action="/product/<%= product._id %>/review" method="POST">
+          <div class="form-group">
+            <label>Posting as</label>
+            <input type="text" value="<%= currentCustomer.name %>" disabled>
+          </div>
+          <div class="form-group">
+            <label for="rating">Rating</label>
+            <select name="rating" id="rating" required>
+              <option value="5">5 / 5 - Excellent</option>
+              <option value="4">4 / 5 - Very Good</option>
+              <option value="3">3 / 5 - Good</option>
+              <option value="2">2 / 5 - Fair</option>
+              <option value="1">1 / 5 - Poor</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="comment">Feedback</label>
+            <textarea name="comment" id="comment" rows="3" placeholder="Share your experience with this jewelry piece..." required></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary" style="width: 100%;">Submit Review</button>
+        </form>
+      <% } else { %>
+        <div class="box-border" style="text-align: center; padding: 2rem 1.5rem; background-color: var(--bg-card); border-top: 1px solid var(--border-color);">
+          <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.25rem;">
+            Please sign in to your customer account to write a verified review.
+          </p>
+          <a href="/login" class="btn btn-primary" style="padding: 0.7rem 1.5rem; display: inline-block;">
+            Sign In to Review
+          </a>
+        </div>
+      <% } %>
+    </div>
+
+    <!-- Existing Reviews List -->
+    <div>
+      <% if (reviews.length === 0) { %>
+        <div class="review-card" style="text-align: center; color: var(--text-muted); padding: 4rem 2rem; border-top: 1px solid var(--border-color);">
+          No reviews yet. Be the first to review this piece!
+        </div>
+      <% } else { %>
+        <div style="display: flex; flex-direction: column;">
+          <% reviews.forEach(review => { %>
+            <div class="review-card">
+              <div class="review-header">
+                <span class="review-author"><%= review.customer_name %></span>
+                <span class="review-stars" style="letter-spacing: 0; color: var(--text-muted); font-size: 0.85rem;">
+                  <%= review.rating %> / 5
+                </span>
+              </div>
+              <p class="review-comment">"<%= review.comment %>"</p>
+              <span style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem; display: block; text-transform: uppercase; letter-spacing: 1px;">
+                <%= new Date(review.review_date).toLocaleDateString() %>
+              </span>
+            </div>
+          <% }) %>
+        </div>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+<%- include('partials/footer') %>

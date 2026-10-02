@@ -1,0 +1,67 @@
+<%- include('partials/header') %>
+
+<div class="page-header" style="text-align: center; margin: 3rem auto 1.5rem; max-width: 680px;">
+  <span class="section-eyebrow" style="color: var(--gold); letter-spacing: 2px;">Back-Office Operations</span>
+  <h1>Admin Management Portal</h1>
+  <p>Restricted access for store managers and inventory curators. Sign in with administrative credentials.</p>
+</div>
+
+<div class="auth-container">
+  <div class="auth-card" style="border-top: 3px solid var(--gold);">
+    <% if (typeof errorMessage !== 'undefined' && errorMessage) { %>
+      <div class="alert-box alert-danger">
+        <%= errorMessage %>
+      </div>
+    <% } %>
+
+    <form action="/admin/login" method="POST" class="auth-form">
+      <div class="form-group">
+        <label for="adminEmail">Administrator Email</label>
+        <input 
+          type="email" 
+          id="adminEmail" 
+          name="email" 
+          placeholder="admin@auragem.com" 
+          required 
+          autofocus
+        >
+      </div>
+
+      <div class="form-group">
+        <label for="adminPassword">Master Password</label>
+        <input 
+          type="password" 
+          id="adminPassword" 
+          name="password" 
+          placeholder="Enter administrator password" 
+          required
+        >
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.9rem; margin-top: 0.5rem; font-weight: 600; letter-spacing: 1px;">
+        Authenticate &amp; Open Dashboard
+      </button>
+    </form>
+
+    <div class="demo-accounts-box" style="margin-top: 1.5rem;">
+      <strong>Administrator Demo Credentials (Viva Shortcut):</strong>
+      <div class="demo-chips" style="margin-top: 0.6rem;">
+        <button 
+          type="button" 
+          class="demo-chip-btn" 
+          onclick="document.getElementById('adminEmail').value='admin@auragem.com'; document.getElementById('adminPassword').value='admin123';"
+          style="border-left: 3px solid var(--gold);"
+        >
+          <strong>Admin Account:</strong> admin@auragem.com (Password: admin123)
+        </button>
+      </div>
+    </div>
+
+    <div class="auth-switch" style="margin-top: 1.5rem; text-align: center;">
+      <span>Looking for regular customer shopping?</span>
+      <a href="/login">Customer Sign In &rarr;</a>
+    </div>
+  </div>
+</div>
+
+<%- include('partials/footer') %>

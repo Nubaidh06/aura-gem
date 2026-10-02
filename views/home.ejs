@@ -1,0 +1,83 @@
+<%- include('partials/header') %>
+
+<!-- Clean Hero Section -->
+<section class="hero-section">
+  <span class="hero-label">Fine Jewelry Collection</span>
+  <h1>Timeless Elegance, Crafted to Perfection</h1>
+  <p>
+    Handcrafted solitaire rings, diamond tennis bracelets, and certified gemstone pendants made with ethical stones and precious metals.
+  </p>
+  <div class="hero-actions">
+    <a href="/catalog" class="btn btn-primary">Browse Full Catalog</a>
+    <% if (currentCustomer) { %>
+      <a href="/customer/<%= currentCustomer._id %>" class="btn btn-secondary">My Saved Wishlist</a>
+    <% } else { %>
+      <a href="/register" class="btn btn-secondary">Create Profile</a>
+    <% } %>
+  </div>
+</section>
+
+<!-- Boutique Standards -->
+<section class="standards-bar">
+  <div class="standard-item">
+    <strong>18K Gold &amp; Platinum</strong>
+    <span>Conflict-free solid precious metals</span>
+  </div>
+  <div class="standard-item">
+    <strong>GIA Certified Diamonds</strong>
+    <span>Individually inspected and graded</span>
+  </div>
+  <div class="standard-item">
+    <strong>Secure Worldwide Delivery</strong>
+    <span>Fully insured complimentary transit</span>
+  </div>
+</section>
+
+<!-- Featured Collection -->
+<section class="featured-section">
+  <div class="section-header-row">
+    <div>
+      <h2>Featured Pieces</h2>
+      <p class="section-subtext">Signature items from our current collections</p>
+    </div>
+    <a href="/catalog" class="view-all-link">View All Catalog (<%= products.length %>) &rarr;</a>
+  </div>
+
+  <div class="product-grid">
+    <% products.slice(0, 3).forEach(product => { %>
+      <div class="product-card">
+        <% if (product.image_url) { %>
+          <a href="/product/<%= product._id %>" class="product-img-wrapper">
+            <img src="<%= product.image_url %>" alt="<%= product.name %>" class="product-img" loading="lazy">
+          </a>
+        <% } %>
+        <div class="product-card-body">
+          <div class="product-badge-row">
+            <span class="product-badge"><%= product.metal_type %> &bull; <%= product.gemstone %></span>
+            <span class="stock-pill"><%= product.stock_quantity %> in stock</span>
+          </div>
+          <h3 class="product-title">
+            <a href="/product/<%= product._id %>"><%= product.name %></a>
+          </h3>
+          <p class="product-desc"><%= product.description %></p>
+          
+          <div class="product-meta">
+            <span class="product-price">$<%= product.price.toLocaleString() %></span>
+          </div>
+
+          <div class="product-actions">
+            <a href="/product/<%= product._id %>" class="btn btn-primary btn-flex">View Details</a>
+            <% if (currentCustomer) { %>
+              <form action="/customer/<%= currentCustomer._id %>/wishlist/add" method="POST">
+                <input type="hidden" name="productId" value="<%= product._id %>">
+                <button type="submit" class="btn btn-secondary btn-icon" title="Save to Wishlist">Save</button>
+              </form>
+            <% } %>
+          </div>
+        </div>
+      </div>
+    <% }) %>
+  </div>
+</section>
+
+<%- include('partials/footer') %>

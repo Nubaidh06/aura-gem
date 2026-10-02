@@ -1,0 +1,17 @@
+# Dependencies
+node_modules/
+
+# Environment variables
+.env
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Microsoft Word temporary lock files
+~$*
+*.tmp
+
+# Backups
+coursework_report_old.pdf
+coursework_report_v1_backup.docx

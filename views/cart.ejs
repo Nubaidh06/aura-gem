@@ -1,0 +1,125 @@
+<%- include('partials/header') %>
+
+<div class="page-header">
+  <h1>Shopping Bag</h1>
+  <p>Review your selected jewelry pieces before placing your order.</p>
+</div>
+
+<% if (typeof cartError !== 'undefined' && cartError) { %>
+  <div class="alert-box alert-danger" style="margin-bottom: 2rem;">
+    <%= cartError %>
+  </div>
+<% } %>
+
+<% if (cartItems.length === 0) { %>
+  <div class="box-border" style="text-align: center; padding: 6rem 2rem; color: var(--text-muted);">
+    <h3 style="font-family: var(--font-heading); font-weight: normal; font-size: 1.5rem; margin-bottom: 1rem;">Your shopping bag is currently empty.</h3>
+    <p><a href="/catalog" class="btn btn-secondary">Continue shopping</a></p>
+  </div>
+<% } else { %>
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>Jewelry Item</th>
+          <th>Unit Price</th>
+          <th style="width: 140px;">Quantity</th>
+          <th>Line Total</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% cartItems.forEach(item => { %>
+          <tr>
+            <td>
+              <div class="cart-item-info">
+                <% if (item.product.image_url) { %>
+                  <img src="<%= item.product.image_url %>" alt="<%= item.product.name %>" class="cart-item-thumb">
+                <% } %>
+                <div>
+                  <a href="/product/<%= item.product._id %>" class="cart-item-link">
+                    <strong><%= item.product.name %></strong>
+                  </a>
+                  <div class="cart-item-subtext">
+                    <%= item.product.metal_type %> &bull; <%= item.product.gemstone %>
+                  </div>
+                </div>
+              </div>
+            </td>
+            <td>$<%= item.product.price.toLocaleString() %></td>
+            <td>
+              <form action="/cart/update" method="POST" style="display: flex; gap: 0.5rem; align-items: center;">
+                <input type="hidden" name="productId" value="<%= item.product._id %>">
+                <input 
+                  type="number" 
+                  name="quantity" 
+                  value="<%= item.quantity %>" 
+                  min="0" 
+                  max="<%= item.product.stock_quantity %>"
+                  style="width: 60px; padding: 0.4rem; background: transparent; border: 1px solid var(--border-dark); border-radius: 0; outline: none; font-family: inherit;"
+                >
+                <button type="submit" class="btn btn-secondary btn-sm" title="Update quantity">Update</button>
+              </form>
+            </td>
+            <td>$<%= item.lineTotal.toLocaleString() %></td>
+            <td>
+              <form action="/cart/update" method="POST" style="margin: 0;">
+                <input type="hidden" name="productId" value="<%= item.product._id %>">
+                <input type="hidden" name="quantity" value="0">
+                <button type="submit" class="btn btn-danger btn-sm">Remove</button>
+              </form>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="summary-box">
+    <h3 style="margin-bottom: 1.5rem; font-family: var(--font-heading); font-weight: normal; font-size: 1.5rem;">Order Summary</h3>
+    <div class="summary-row">
+      <span>Subtotal</span>
+      <span>$<%= subtotal.toLocaleString() %></span>
+    </div>
+    <div class="summary-row">
+      <span>Estimated Tax (8%)</span>
+      <span>$<%= tax.toLocaleString() %></span>
+    </div>
+    <div class="summary-row summary-total">
+      <span>Total</span>
+      <span>$<%= total.toLocaleString() %></span>
+    </div>
+
+    <!-- Checkout Action -->
+    <% if (currentCustomer) { %>
+      <form action="/orders/checkout" method="POST" style="margin-top: 1.5rem;">
+        <button 
+          type="submit" 
+          class="btn btn-primary" 
+          style="width: 100%; padding: 1rem;"
+        >
+          Complete Order (<%= currentCustomer.name %>)
+        </button>
+      </form>
+    <% } else { %>
+      <div style="margin-top: 1.5rem;">
+        <a 
+          href="/login" 
+          class="btn btn-primary" 
+          style="width: 100%; padding: 1rem; display: block; text-align: center;"
+        >
+          Sign In to Complete Order
+        </a>
+        <p style="text-align: center; font-size: 0.8rem; color: var(--text-muted); margin-top: 0.75rem;">
+          New customer? <a href="/register" style="color: var(--gold-dark); font-weight: 600;">Register here</a>
+        </p>
+      </div>
+    <% } %>
+    
+    <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 1rem; text-align: center; line-height: 1.6;">
+      All shipments include fully insured express delivery and signature confirmation.
+    </p>
+  </div>
+<% } %>
+
+<%- include('partials/footer') %>

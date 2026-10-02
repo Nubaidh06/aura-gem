@@ -1,0 +1,88 @@
+<%- include('partials/header') %>
+
+<div class="page-header">
+  <h1>Fine Jewelry Catalog</h1>
+  <p>Explore our complete collection of handcrafted engagement rings, necklaces, bracelets, and earrings.</p>
+</div>
+
+<!-- Search and Category Filtering Bar -->
+<div class="filter-bar">
+  <form action="/catalog" method="GET" class="search-form">
+    <% if (activeCategory) { %>
+      <input type="hidden" name="category" value="<%= activeCategory %>">
+    <% } %>
+    <input 
+      type="text" 
+      name="search" 
+      placeholder="Search rings, diamonds, emeralds, gold..." 
+      value="<%= searchQuery %>"
+    >
+    <button type="submit" class="btn btn-primary">Search</button>
+    <% if (searchQuery) { %>
+      <a href="/catalog<%= activeCategory ? '?category=' + activeCategory : '' %>" class="btn btn-secondary">Clear</a>
+    <% } %>
+  </form>
+
+  <div class="category-chips">
+    <a 
+      href="/catalog<%= searchQuery ? '?search=' + encodeURIComponent(searchQuery) : '' %>" 
+      class="chip <%= !activeCategory ? 'active' : '' %>"
+    >
+      All Categories
+    </a>
+    <% categories.forEach(cat => { %>
+      <a 
+        href="/catalog?category=<%= cat._id %><%= searchQuery ? '&search=' + encodeURIComponent(searchQuery) : '' %>" 
+        class="chip <%= activeCategory === cat._id.toString() ? 'active' : '' %>"
+      >
+        <%= cat.name %>
+      </a>
+    <% }) %>
+  </div>
+</div>
+
+<!-- Product Cards Grid -->
+<% if (products.length === 0) { %>
+  <div style="text-align: center; padding: 4rem 1rem; color: var(--text-muted);">
+    <h3>No jewelry pieces match your criteria.</h3>
+    <p style="margin-top: 0.5rem;"><a href="/catalog">Reset all filters</a></p>
+  </div>
+<% } else { %>
+  <div class="product-grid">
+    <% products.forEach(product => { %>
+      <div class="product-card">
+        <% if (product.image_url) { %>
+          <a href="/product/<%= product._id %>" class="product-img-wrapper">
+            <img src="<%= product.image_url %>" alt="<%= product.name %>" class="product-img" loading="lazy">
+          </a>
+        <% } %>
+        <div class="product-card-body">
+          <div class="product-badge-row">
+            <span class="product-badge"><%= product.metal_type %> &bull; <%= product.gemstone %></span>
+            <span class="stock-pill"><%= product.stock_quantity %> left</span>
+          </div>
+          <h2 class="product-title">
+            <a href="/product/<%= product._id %>"><%= product.name %></a>
+          </h2>
+          <p class="product-desc"><%= product.description %></p>
+          
+          <div class="product-meta">
+            <span class="product-price">$<%= product.price.toLocaleString() %></span>
+          </div>
+
+          <div class="product-actions">
+            <a href="/product/<%= product._id %>" class="btn btn-primary btn-flex">View Details</a>
+            <% if (currentCustomer) { %>
+              <form action="/customer/<%= currentCustomer._id %>/wishlist/add" method="POST">
+                <input type="hidden" name="productId" value="<%= product._id %>">
+                <button type="submit" class="btn btn-secondary btn-icon" title="Save to Wishlist">Save</button>
+              </form>
+            <% } %>
+          </div>
+        </div>
+      </div>
+    <% }) %>
+  </div>
+<% } %>
+
+<%- include('partials/footer') %>

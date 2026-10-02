@@ -1,0 +1,414 @@
+<%- include('partials/header') %>
+
+<div class="page-header">
+  <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+    <div>
+      <span class="section-eyebrow" style="color: var(--gold); letter-spacing: 2px;">Restricted Management Suite</span>
+      <h1>Store Administration &amp; Analytics</h1>
+      <p>Overview of inventory distribution, category performance, and live store transactions.</p>
+    </div>
+    <div style="text-align: right;">
+      <span style="display: inline-block; background: #111827; color: var(--gold); border: 1px solid var(--gold); padding: 0.35rem 0.85rem; border-radius: 4px; font-size: 0.8rem; font-weight: 600;">
+        Authenticated Administrator
+      </span>
+    </div>
+  </div>
+</div>
+
+<% if (typeof adminError !== 'undefined' && adminError) { %>
+  <div class="alert-box alert-danger" style="margin-bottom: 2rem;">
+    <%= adminError %>
+  </div>
+<% } %>
+
+<% if (typeof adminMessage !== 'undefined' && adminMessage) { %>
+  <div class="alert-box" style="background: #ECFDF5; color: #065F46; border: 1px solid #A7F3D0; margin-bottom: 2rem;">
+    <%= adminMessage %>
+  </div>
+<% } %>
+
+<!-- Overview KPI Cards -->
+<div class="kpi-grid">
+  <div class="kpi-card kpi-sapphire">
+    <div class="kpi-value"><%= totalOrdersCount %></div>
+    <div class="kpi-label">Total Orders Processed</div>
+    <div class="kpi-sub">Live customer transactions</div>
+  </div>
+  <div class="kpi-card kpi-emerald">
+    <div class="kpi-value"><%= totalCustomersCount %></div>
+    <div class="kpi-label">Active Customers</div>
+    <div class="kpi-sub">Registered VIP buyers</div>
+  </div>
+  <div class="kpi-card kpi-gold">
+    <div class="kpi-value"><%= allCategories.length %></div>
+    <div class="kpi-label">Product Categories</div>
+    <div class="kpi-sub">Artisan collections</div>
+  </div>
+</div>
+
+<!-- Category Analytics Table -->
+<div class="page-header" style="margin-top: 3rem;">
+  <h2>Category Inventory &amp; Pricing Breakdown</h2>
+  <p>Real-time metrics calculated across all active jewelry collections.</p>
+</div>
+
+<div class="table-wrapper" style="margin-bottom: 4rem;">
+  <table>
+    <thead>
+      <tr>
+        <th>Category Name</th>
+        <th>Product Varieties</th>
+        <th>Total Stock on Hand</th>
+        <th>Average Product Price</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% if (categoryStats.length === 0) { %>
+        <tr>
+          <td colspan="4" style="text-align: center; color: var(--text-muted); padding: 3rem;">No products categorized yet.</td>
+        </tr>
+      <% } else { %>
+        <% categoryStats.forEach(stat => { %>
+          <tr>
+            <td>
+              <strong style="font-family: var(--font-heading); font-size: 1.1rem; font-weight: normal;"><%= stat.categoryInfo.name %></strong>
+              <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.25rem;"><%= stat.categoryInfo.description %></div>
+            </td>
+            <td><%= stat.totalProducts %> items</td>
+            <td><%= stat.totalStock %> units</td>
+            <td style="font-size: 1.1rem;">
+              $<%= stat.avgPrice ? stat.avgPrice.toFixed(2) : '0.00' %>
+            </td>
+          </tr>
+        <% }) %>
+      <% } %>
+    </tbody>
+  </table>
+</div>
+
+<!-- Product Creation Section -->
+<div class="page-header" style="margin-top: 3.5rem;">
+  <h2>Add New Jewelry Piece</h2>
+  <p>Create and publish new artisanal catalog items directly into MongoDB.</p>
+</div>
+
+<div class="box-border" style="border-top: 1px solid var(--border-color); padding: 2.5rem; margin-bottom: 4rem; background-color: var(--bg-card);">
+  <form action="/admin/products/add" method="POST">
+    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem;">
+      <div class="form-group">
+        <label for="prodName">Piece Title / Name</label>
+        <input type="text" id="prodName" name="name" placeholder="e.g. 18K Emerald Cut Solitaire Ring" required>
+      </div>
+
+      <div class="form-group">
+        <label for="prodCat">Category</label>
+        <select id="prodCat" name="category_id" required>
+          <% allCategories.forEach(cat => { %>
+            <option value="<%= cat._id %>"><%= cat.name %></option>
+          <% }) %>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="prodDesc">Product Description</label>
+      <textarea id="prodDesc" name="description" rows="2" placeholder="Detailed artisanal story and gemological summary..." required></textarea>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 1.5rem;">
+      <div class="form-group">
+        <label for="prodPrice">Price ($ USD)</label>
+        <input type="number" id="prodPrice" name="price" step="0.01" min="1" placeholder="1250.00" required>
+      </div>
+
+      <div class="form-group">
+        <label for="prodStock">Stock Quantity</label>
+        <input type="number" id="prodStock" name="stock_quantity" min="1" value="5" required>
+      </div>
+
+      <div class="form-group">
+        <label for="prodMetal">Metal Type</label>
+        <select id="prodMetal" name="metal_type">
+          <option value="Yellow Gold">18K Yellow Gold</option>
+          <option value="White Gold">18K White Gold</option>
+          <option value="Rose Gold">18K Rose Gold</option>
+          <option value="Platinum">Solid Platinum</option>
+          <option value="Sterling Silver">Sterling Silver</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="prodGem">Primary Gemstone</label>
+        <select id="prodGem" name="gemstone">
+          <option value="Diamond">Diamond</option>
+          <option value="Emerald">Colombian Emerald</option>
+          <option value="Sapphire">Ceylon Sapphire</option>
+          <option value="Ruby">Burmese Ruby</option>
+          <option value="Pearl">South Sea Pearl</option>
+          <option value="None">None (Solid Metal)</option>
+        </select>
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 1.5rem;">
+      <div class="form-group">
+        <label for="prodImg">Photography Image URL</label>
+        <input type="url" id="prodImg" name="image_url" placeholder="https://images.unsplash.com/photo-..." value="https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&w=800&q=80">
+      </div>
+
+      <div class="form-group">
+        <label for="prodSpec">Specifications / Sizing</label>
+        <input type="text" id="prodSpec" name="specification" placeholder="e.g. Sizes: 6, 7, 8 or Chain: 18 in">
+      </div>
+
+      <div class="form-group">
+        <label for="prodCert">Certification</label>
+        <input type="text" id="prodCert" name="certification" placeholder="e.g. GIA Certified" value="GIA Certified">
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary" style="padding: 0.9rem 2.5rem; margin-top: 1rem;">
+      Publish Piece to Catalog
+    </button>
+  </form>
+</div>
+
+<!-- Active Catalog Listings & Inventory Control Section -->
+<div class="page-header" style="margin-top: 4.5rem;">
+  <div style="display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 1rem;">
+    <div>
+      <h2>Active Catalog Listings &amp; Inventory Control</h2>
+      <p>Audit stock levels, inspect live pieces, and permanently delist or remove discontinued jewelry.</p>
+    </div>
+    <span style="font-size: 0.85rem; color: var(--text-muted);">
+      Total Active Pieces: <strong><%= typeof allProducts !== 'undefined' ? allProducts.length : 0 %></strong>
+    </span>
+  </div>
+</div>
+
+<div class="table-wrapper" style="margin-bottom: 4.5rem;">
+  <table>
+    <thead>
+      <tr>
+        <th>Jewelry Piece</th>
+        <th>Collection Category</th>
+        <th>Artisan Composition</th>
+        <th>Stock on Hand</th>
+        <th>Price ($ USD)</th>
+        <th>Listing Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% if (typeof allProducts === 'undefined' || allProducts.length === 0) { %>
+        <tr>
+          <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 3rem;">No active jewelry pieces found in catalog.</td>
+        </tr>
+      <% } else { %>
+        <% allProducts.forEach(prod => { %>
+          <tr>
+            <td>
+              <div style="display: flex; align-items: center; gap: 1rem;">
+                <% if (prod.image_url) { %>
+                  <img src="<%= prod.image_url %>" alt="<%= prod.name %>" style="width: 48px; height: 48px; object-fit: cover; border-radius: var(--radius-sm); border: 1px solid var(--border);">
+                <% } %>
+                <div>
+                  <strong><%= prod.name %></strong>
+                  <div style="font-size: 0.75rem; color: var(--text-muted);">
+                    Ref: <code><%= prod._id.toString().substring(18) %></code>
+                  </div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <span style="font-size: 0.85rem; font-weight: 500;">
+                <%= prod.category ? prod.category.name : 'Uncategorized' %>
+              </span>
+            </td>
+            <td style="font-size: 0.85rem; color: var(--text-muted);">
+              <%= prod.metal_type %> &bull; <%= prod.gemstone %>
+            </td>
+            <td>
+              <span class="<%= prod.stock_quantity <= 2 ? 'stock-warning' : '' %>" style="font-weight: 600;">
+                <%= prod.stock_quantity %> <%= prod.stock_quantity === 1 ? 'unit' : 'units' %>
+              </span>
+            </td>
+            <td style="font-size: 1.05rem; font-weight: 600; color: var(--gold-dark);">
+              $<%= prod.price.toLocaleString() %>
+            </td>
+            <td>
+              <div style="display: flex; flex-direction: column; gap: 0.6rem;">
+                <div style="display: flex; gap: 0.5rem; align-items: center;">
+                  <a href="/product/<%= prod._id %>" class="btn btn-secondary btn-sm" target="_blank">View Piece</a>
+                  <form action="/admin/products/delete/<%= prod._id %>" method="POST" style="margin: 0;">
+                    <button 
+                      type="submit" 
+                      class="btn btn-danger btn-sm" 
+                      onclick="return confirm('Permanently remove listing &quot;<%= prod.name %>&quot;? This will also remove the item from customer wishlists and reviews.')"
+                    >
+                      Delete
+                    </button>
+                  </form>
+                </div>
+                <form action="/admin/products/update/<%= prod._id %>" method="POST" style="display: flex; gap: 0.35rem; align-items: center; margin: 0;">
+                  <input 
+                    type="number" 
+                    name="stock_quantity" 
+                    value="<%= prod.stock_quantity %>" 
+                    min="0" 
+                    title="Update stock units" 
+                    style="width: 52px; padding: 0.25rem 0.35rem; font-size: 0.8rem; border: 1px solid var(--border); border-radius: var(--radius-sm); text-align: center;"
+                  >
+                  <span style="font-size: 0.75rem; color: var(--text-muted);">$</span>
+                  <input 
+                    type="number" 
+                    step="0.01" 
+                    name="price" 
+                    value="<%= prod.price %>" 
+                    min="1" 
+                    title="Update price ($)" 
+                    style="width: 72px; padding: 0.25rem 0.35rem; font-size: 0.8rem; border: 1px solid var(--border); border-radius: var(--radius-sm); text-align: right;"
+                  >
+                  <button type="submit" class="btn btn-secondary btn-sm" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">Update</button>
+                </form>
+              </div>
+            </td>
+          </tr>
+        <% }) %>
+      <% } %>
+    </tbody>
+  </table>
+</div>
+
+<!-- Category Management Section -->
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4rem;">
+  <!-- Add Category Form -->
+  <div>
+    <h3 style="margin-bottom: 1.5rem; font-family: var(--font-heading); font-weight: normal; font-size: 1.5rem;">Add New Category</h3>
+    <form action="/admin/categories/add" method="POST" class="box-border" style="border-top: 1px solid var(--border-color);">
+      <div class="form-group">
+        <label for="catName">Category Name</label>
+        <input type="text" id="catName" name="name" placeholder="e.g. Watches or Pendants" required>
+      </div>
+      <div class="form-group">
+        <label for="catDesc">Description</label>
+        <textarea id="catDesc" name="description" rows="2" placeholder="Brief summary of items in collection..." required></textarea>
+      </div>
+      <div class="form-group">
+        <label for="catOrder">Display Order</label>
+        <input type="number" id="catOrder" name="display_order" value="<%= allCategories.length + 1 %>" min="1">
+      </div>
+      <button type="submit" class="btn btn-primary" style="width: 100%;">Create Category</button>
+    </form>
+  </div>
+
+  <!-- Existing Categories List -->
+  <div>
+    <h3 style="margin-bottom: 1.5rem; font-family: var(--font-heading); font-weight: normal; font-size: 1.5rem;">Existing Categories</h3>
+    <div style="display: flex; flex-direction: column; gap: 1rem;">
+      <% allCategories.forEach(cat => { 
+           const stat = categoryStats.find(s => s._id.toString() === cat._id.toString());
+           const prodCount = stat ? stat.totalProducts : 0;
+      %>
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 1.25rem; border: 1px solid var(--border-color); background: var(--bg-surface);">
+          <div>
+            <strong style="font-family: var(--font-heading); font-weight: normal; font-size: 1.1rem;"><%= cat.name %></strong>
+            <span style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-left: 0.5rem;">(Order: <%= cat.display_order %>)</span>
+            <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem;">
+              <strong><%= prodCount %></strong> <%= prodCount === 1 ? 'product' : 'products' %> assigned
+            </div>
+          </div>
+          <form action="/admin/categories/delete/<%= cat._id %>" method="POST" style="margin: 0;">
+            <button 
+              type="submit" 
+              class="btn btn-danger btn-sm" 
+              onclick="return confirm('Delete category <%= cat.name %>? Note: Categories with active products cannot be deleted.')"
+            >
+              Delete
+            </button>
+          </form>
+        </div>
+      <% }) %>
+    </div>
+  </div>
+</div>
+
+<!-- Order Fulfillment Management Section -->
+<div class="page-header" style="margin-top: 4.5rem;">
+  <h2>Recent Customer Orders &amp; Fulfillment</h2>
+  <p>Track customer purchases and update shipping fulfillment status in MongoDB.</p>
+</div>
+
+<div class="table-wrapper" style="margin-bottom: 4rem;">
+  <table>
+    <thead>
+      <tr>
+        <th>Order Reference</th>
+        <th>Customer</th>
+        <th>Order Date</th>
+        <th>Pieces Purchased</th>
+        <th>Total Amount</th>
+        <th>Fulfillment Status</th>
+        <th>Update Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% if (typeof recentOrders === 'undefined' || recentOrders.length === 0) { %>
+        <tr>
+          <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 3rem;">No customer orders placed yet.</td>
+        </tr>
+      <% } else { %>
+        <% recentOrders.forEach(order => { %>
+          <tr>
+            <td>
+              <code style="font-size: 0.8rem; background: var(--bg-canvas); padding: 0.2rem 0.4rem; border: 1px solid var(--border);">
+                #<%= order._id.toString().substring(18) %>
+              </code>
+            </td>
+            <td>
+              <strong><%= order.customer ? order.customer.name : 'Guest / Deleted User' %></strong>
+              <div style="font-size: 0.8rem; color: var(--text-muted);"><%= order.customer ? order.customer.email : '' %></div>
+            </td>
+            <td style="font-size: 0.85rem; color: var(--text-muted);">
+              <%= new Date(order.order_date).toLocaleDateString() %>
+            </td>
+            <td>
+              <% order.items.forEach(it => { %>
+                <div style="font-size: 0.85rem; white-space: nowrap;">
+                  <%= it.quantity %>x <%= it.name %>
+                </div>
+              <% }) %>
+            </td>
+            <td style="font-size: 1.05rem; font-weight: 600; color: var(--gold-dark);">
+              $<%= order.total_price.toLocaleString() %>
+            </td>
+            <td>
+              <% 
+                let statusClass = 'status-processing';
+                if (order.status === 'Delivered') statusClass = 'status-delivered';
+                else if (order.status === 'Shipped') statusClass = 'status-shipped';
+                else if (order.status === 'Cancelled') statusClass = 'status-cancelled';
+              %>
+              <span class="status-badge <%= statusClass %>">
+                <%= order.status %>
+              </span>
+            </td>
+            <td>
+              <form action="/admin/orders/status" method="POST" style="display: flex; gap: 0.5rem; align-items: center; margin: 0;">
+                <input type="hidden" name="orderId" value="<%= order._id %>">
+                <select name="status" style="padding: 0.35rem 0.5rem; font-size: 0.8rem; border: 1px solid var(--border); background: var(--bg-surface); border-radius: var(--radius-sm); font-family: inherit;">
+                  <option value="Processing" <%= order.status === 'Processing' ? 'selected' : '' %>>Processing</option>
+                  <option value="Shipped" <%= order.status === 'Shipped' ? 'selected' : '' %>>Shipped</option>
+                  <option value="Delivered" <%= order.status === 'Delivered' ? 'selected' : '' %>>Delivered</option>
+                  <option value="Cancelled" <%= order.status === 'Cancelled' ? 'selected' : '' %>>Cancelled</option>
+                </select>
+                <button type="submit" class="btn btn-secondary btn-sm" style="padding: 0.35rem 0.65rem;">Save</button>
+              </form>
+            </td>
+          </tr>
+        <% }) %>
+      <% } %>
+    </tbody>
+  </table>
+</div>
+
+<%- include('partials/footer') %>

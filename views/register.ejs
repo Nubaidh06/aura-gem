@@ -1,0 +1,124 @@
+<%- include('partials/header') %>
+
+<div class="page-header">
+  <span class="section-eyebrow">Customer Registration</span>
+  <h1>Create Your Customer Profile</h1>
+  <p>Register as a new customer to save pieces to your personal wishlist and place jewelry orders.</p>
+</div>
+
+<div class="register-container">
+  <div class="register-card">
+    <% if (typeof errorMessage !== 'undefined' && errorMessage) { %>
+      <div class="alert-box alert-danger">
+        <%= errorMessage %>
+      </div>
+    <% } %>
+
+    <form action="/register" method="POST" class="register-form">
+      <div class="form-section-title">Personal Details</div>
+      
+      <div class="form-group">
+        <label for="name">Full Name *</label>
+        <input 
+          type="text" 
+          id="name" 
+          name="name" 
+          placeholder="e.g. Eleanor Vance" 
+          required
+        >
+      </div>
+
+      <div class="form-row">
+        <div class="form-group" style="flex: 1;">
+          <label for="email">Email Address *</label>
+          <input 
+            type="email" 
+            id="email" 
+            name="email" 
+            placeholder="e.g. eleanor.vance@example.com" 
+            required
+          >
+        </div>
+
+        <div class="form-group" style="flex: 1;">
+          <label for="phone">Phone Number</label>
+          <input 
+            type="tel" 
+            id="phone" 
+            name="phone" 
+            placeholder="e.g. +1-555-0199"
+          >
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Account Password * (Min 6 characters)</label>
+        <input 
+          type="password" 
+          id="password" 
+          name="password" 
+          placeholder="Create a secure password" 
+          minlength="6" 
+          required
+        >
+      </div>
+
+      <div class="form-section-title" style="margin-top: 1.5rem;">Default Shipping Address</div>
+
+      <div class="form-group">
+        <label for="street">Street Address</label>
+        <input 
+          type="text" 
+          id="street" 
+          name="street" 
+          placeholder="e.g. 450 Madison Avenue, Apt 8B"
+        >
+      </div>
+
+      <div class="form-row">
+        <div class="form-group" style="flex: 2;">
+          <label for="city">City</label>
+          <input 
+            type="text" 
+            id="city" 
+            name="city" 
+            placeholder="e.g. New York"
+          >
+        </div>
+
+        <div class="form-group" style="flex: 1;">
+          <label for="state">State</label>
+          <input 
+            type="text" 
+            id="state" 
+            name="state" 
+            placeholder="e.g. NY"
+          >
+        </div>
+
+        <div class="form-group" style="flex: 1;">
+          <label for="zip">Zip / Postal Code</label>
+          <input 
+            type="text" 
+            id="zip" 
+            name="zip" 
+            placeholder="e.g. 10022"
+          >
+        </div>
+      </div>
+
+      <div class="register-actions" style="margin-top: 2rem;">
+        <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.9rem;">
+          Register Customer Profile
+        </button>
+      </div>
+
+      <div class="auth-switch">
+        <span>Already have an account?</span>
+        <a href="/login">Sign in here &rarr;</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<%- include('partials/footer') %>

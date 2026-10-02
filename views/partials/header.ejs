@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aura &amp; Gem | Artisanal Fine Jewelry</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css?v=4.0">
+</head>
+<body>
+  <header class="navbar">
+    <a href="/" class="brand">AURA <span class="brand-gold">&amp;</span> GEM</a>
+    
+    <nav class="nav-links">
+      <a href="/">Home</a>
+      <a href="/catalog">Catalog</a>
+      <a href="/cart" class="nav-cart-link">
+        Bag <span class="cart-badge"><%= cartCount %></span>
+      </a>
+      <% if (currentCustomer && currentCustomer.role === 'admin') { %>
+        <a href="/admin" class="nav-admin-link" style="color: var(--gold); border: 1px solid var(--gold); padding: 0.3rem 0.75rem; border-radius: 4px; font-weight: 600;">Admin Dashboard</a>
+      <% } %>
+
+      <% if (currentCustomer) { %>
+        <a href="/customer/<%= currentCustomer._id %>" class="nav-account-link">
+          My Account (<%= currentCustomer.name.split(' ')[0] %>)
+        </a>
+        <a href="/logout" class="nav-logout-btn" title="Sign out">Sign Out</a>
+      <% } else { %>
+        <a href="/login" class="nav-login-link">Sign In</a>
+        <a href="/register" class="nav-register-btn">Register</a>
+      <% } %>
+    </nav>
+  </header>
+  <main class="container">

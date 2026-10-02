@@ -1,0 +1,24 @@
+<%- include('partials/header') %>
+
+<div class="page-header" style="text-align: center; margin: 4rem auto 2rem; max-width: 600px;">
+  <span class="section-eyebrow" style="color: #DC2626;"><%= typeof statusCode !== 'undefined' ? statusCode : 'Notice' %></span>
+  <h1><%= typeof title !== 'undefined' ? title : 'Access Restricted' %></h1>
+  <p style="margin-top: 1rem; color: var(--text-muted); font-size: 1.05rem;">
+    <%= typeof message !== 'undefined' ? message : 'The requested resource is restricted or unavailable.' %>
+  </p>
+</div>
+
+<div style="text-align: center; margin-bottom: 5rem;">
+  <div style="display: inline-flex; gap: 1rem; justify-content: center;">
+    <a href="/" class="btn btn-secondary">Return to Home</a>
+    <% if (typeof showLoginBtn !== 'undefined' && showLoginBtn) { %>
+      <a href="/login" class="btn btn-primary">Sign In</a>
+    <% } else if (typeof showAdminLoginBtn !== 'undefined' && showAdminLoginBtn) { %>
+      <a href="/admin/login" class="btn btn-primary">Admin Sign In</a>
+    <% } else { %>
+      <a href="/catalog" class="btn btn-primary">Browse Catalog</a>
+    <% } %>
+  </div>
+</div>
+
+<%- include('partials/footer') %>

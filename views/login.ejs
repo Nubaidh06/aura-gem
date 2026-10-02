@@ -1,0 +1,75 @@
+<%- include('partials/header') %>
+
+<div class="page-header">
+  <span class="section-eyebrow">Artisanal Atelier</span>
+  <h1>Customer Sign In</h1>
+  <p>Access your saved jewelry wishlist, track recent orders, and manage shipping addresses.</p>
+</div>
+
+<div class="auth-container">
+  <div class="auth-card">
+    <% if (typeof errorMessage !== 'undefined' && errorMessage) { %>
+      <div class="alert-box alert-danger">
+        <%= errorMessage %>
+      </div>
+    <% } %>
+
+    <form action="/login" method="POST" class="auth-form">
+      <div class="form-group">
+        <label for="email">Customer Email Address</label>
+        <input 
+          type="email" 
+          id="email" 
+          name="email" 
+          placeholder="e.g. sarah.j@example.com" 
+          required 
+          autofocus
+        >
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input 
+          type="password" 
+          id="password" 
+          name="password" 
+          placeholder="Enter your account password" 
+          required
+        >
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.85rem; margin-top: 0.5rem;">
+        Sign In to Account
+      </button>
+    </form>
+
+    <div class="auth-switch">
+      <span>Don't have a profile yet?</span>
+      <a href="/register">Register as a New Customer &rarr;</a>
+    </div>
+
+    <% if (typeof demoCustomers !== 'undefined' && demoCustomers && demoCustomers.length > 0) { %>
+      <div class="demo-accounts-box">
+        <strong>Quick Demo Accounts (Fills Email &amp; Password):</strong>
+        <div class="demo-chips">
+          <% demoCustomers.filter(c => c.role !== 'admin').forEach(customer => { %>
+            <button 
+              type="button" 
+              class="demo-chip-btn" 
+              onclick="document.getElementById('email').value='<%= customer.email %>'; document.getElementById('password').value='password123';"
+            >
+              <%= customer.name %> (<%= customer.email %>)
+            </button>
+          <% }) %>
+        </div>
+        <div style="margin-top: 1rem; padding-top: 0.75rem; border-top: 1px dashed var(--border); text-align: center;">
+          <a href="/admin/login" style="color: var(--gold-dark); font-weight: 600; font-size: 0.8rem;">
+            Store Manager or Administrator? Sign in to Admin Portal &rarr;
+          </a>
+        </div>
+      </div>
+    <% } %>
+  </div>
+</div>
+
+<%- include('partials/footer') %>
